@@ -39,8 +39,9 @@ app.post('/new',async (req,res)=>{
             console.log(err);
         }
         else {
-            Interview.create({interviewer: req.body.name, Emailid: req.body.email, Timing: req.body.time}, (err, interview) => {
+            Interview.create({Interviewer: req.body.name, Emailid: req.body.email, Timing: req.body.time}, (err, interview) => {
               if(err) {}
+              //console.log(interview)
               res.redirect('/interview');
             })
         }
@@ -48,7 +49,7 @@ app.post('/new',async (req,res)=>{
 });
 
 app.post('/delete', async (req, res) => {
-  Interview.deleteOne({interviewer: req.body.interviewer, Emailid: req.body.email}, err => {
+  Interview.deleteOne({$and:[{Interviewer: req.body.interviewer},{ Emailid: req.body.email}]}, err => {
     if(err) {
       res.json({n: "some err"});
     }
@@ -59,12 +60,12 @@ app.post('/delete', async (req, res) => {
 });
 
 app.post('/update', async (req, res) => {
-  Interview.find({interviewer: req.body.interviewer, Emailid: req.body.email}, (err, interview) => {
+  Interview.find({Interviewer: req.body.interviewer, Emailid: req.body.email}, (err, interview) => {
     if(err) {
       res.send(err);
     }
     else {
-      interview.interviewer = interview.interviewer | req.body.interviewer;
+      interview.Interviewer = interview.Interviewer | req.body.interviewer;
       interview.Emailid = interview.Emailid | req.body.email;
       interview.Timing = interview.Timing | req.body.time;
       interview.save().then(res.redirect('/interview'));
@@ -78,6 +79,7 @@ app.get('/interview',(req,res)=>{
             res.send('err',err);
         }
         else{
+            //console.log(data);
             res.render('show-interview',{data});
         }
     })
