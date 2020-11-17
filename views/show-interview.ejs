@@ -1,0 +1,20 @@
+<html>
+    <head></head>
+    <body>
+        <table>
+        <% data.forEach(element => { %>
+        <tr>
+            <td>
+                <%= element.name %>
+            </td>
+            <td>
+                <%= element.email %>
+            </td>
+            <td>
+                <%= element.time %>
+            </td>
+        </tr>    
+        <% }); %>
+        </table> 
+    </body>
+</html>
