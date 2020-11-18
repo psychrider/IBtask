@@ -1,6 +1,9 @@
 <html>
-    <head></head>
+    <head>
+        <link>
+    </head>
     <body>
+        <h2>Interviews...</h2>
         <table>
         <% data.forEach(element => { %>
         <tr>
@@ -12,6 +15,12 @@
             </td>
             <td>
                 <%= element.Timing %>
+            </td>
+            <td>
+                <form action="/delete" method ="POST" >
+                    <input type="hidden" value="<%= element._id %>" name="id">
+                    <button type="submit">delete</button>
+                </form>
             </td>
         </tr>
         

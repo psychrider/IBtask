@@ -1,17 +1,23 @@
 const bodyparser = require("body-parser");
-
 const express = require('express');
-
 const app = express();
+const mongoose     = require('mongoose');
 
-const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost:27017/test', {useNewUrlParser: true, useUnifiedTopology: true});
 
-const User = mongoose.model('User', { Name: String , Emailid: String});
-const Interview = mongoose.model('Interview', { Interviewer: String , Emailid: String, Timing: Date});
+const Interview = require('./models/interview');
+const User = require('./models/user');
+
+mongoose.connect('mongodb://localhost:27017/portal', { // Connection to database
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => console.log('Connected to DB!'))
+.catch(error => console.log(error.message));
+
 
 app.set('view engine', 'ejs');
 app.use(bodyparser.urlencoded({extended: true}));
+
 
 app.get('/',(req,res)=>{
     res.send('root!');
@@ -21,11 +27,20 @@ app.get('/newUser',(req,res)=>{
     res.render('newUser.ejs');
 });
 
-app.post('/newUser',(req,res)=>{  
-    const d = new Date();
-    const emp = new User({ Name: req.body.name, Emailid: req.body.email});
-    emp.save();
-    res.redirect('/interview');
+app.post('/newUser',async (req,res)=>{ 
+    console.log(req.body);
+    const emp = new User({ 
+        Name: req.body.name,
+        Emailid: req.body.email
+    });
+    emp.save().then(emp =>{
+        console.log(emp);
+        res.redirect('/users');
+    })
+    .catch(err => {
+        console.log(err);
+    })
+    
 });
 
 app.get('/new',(req,res)=>{ 
@@ -49,7 +64,7 @@ app.post('/new',async (req,res)=>{
 });
 
 app.post('/delete', async (req, res) => {
-  Interview.deleteOne({$and:[{Interviewer: req.body.interviewer},{ Emailid: req.body.email}]}, err => {
+  Interview.deleteOne({_id: req.body.id}, err => {
     if(err) {
       res.json({n: "some err"});
     }
@@ -85,8 +100,19 @@ app.get('/interview',(req,res)=>{
     })
 })
 
+app.get('/users',(req,res)=>{
+    User.find({},(err,data)=>{
+        if(err){
+            res.send('err',err);
+        }
+        else{
+            //console.log(data);
+            res.render('show-user',{data});
+        }
+    })
+})
 
 
 app.listen(3000,()=>{
-    console.log('servser is up..');
+    console.log('server is up...'); 
 })
